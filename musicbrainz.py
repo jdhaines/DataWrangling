@@ -57,22 +57,63 @@ def main():
     the structure one level at a time or copy the output to a separate output
     file.
     '''
-    results = query_by_name(ARTIST_URL, query_type["simple"], "Beatles")
+    # results = query_by_name(ARTIST_URL, query_type["simple"], "queen")
+    # pretty_print(results)
+
+    # artist_id = results["artists"][1]["id"]
+    # print("\nARTIST:")
+    # pretty_print(results["artists"][1])
+
+    # artist_data = query_site(ARTIST_URL, query_type["releases"], artist_id)
+    # releases = artist_data["releases"]
+    # print("\nONE RELEASE:")
+    # pretty_print(releases[1], indent=2)
+
+    # release_titles = [r["title"] for r in releases]
+    # print("\nALL TITLES:")
+    # for t in release_titles:
+    #     print(t)
+
+    # First Aid Kit Question
+    # results = query_by_name(ARTIST_URL, query_type["simple"],
+    #                          "First Aid Kit")
+    # pretty_print(results)
+
+    # print('{} bands.'.format(len(results['artists'])))
+    # for i in range(len(results['artists'])):
+    #     print(results['artists'][i]['name'])
+
+    # Queen Question
+    # results = query_by_name(ARTIST_URL, query_type["simple"], "Queen")
+    # pretty_print(results)
+
+    # print('The begin-area name is: {}'.format(results['artists'][0]
+    #       ['begin-area']['name']))
+
+    # Beatles Question
+    # results = query_by_name(ARTIST_URL, query_type["simple"], "Beatles")
+    # pretty_print(results)
+
+    # for i in results['artists'][0]['aliases']:
+    #     if i['locale'] == 'es':
+    #         spanish_alias = i['name']
+
+    # print('The spanish alias for "The Beatles" is: {}'.format(spanish_alias))
+
+    # Nirvana Question
+    results = query_by_name(ARTIST_URL, query_type["simple"], "Nirvana")
     pretty_print(results)
 
-    artist_id = 'b10bbbfc-cf9e-42e0-be17-e2c3e1d2600d'  # results["artists"][1]["id"]
-    print("\nARTIST:")
-    pretty_print(results["artists"][1])
+    print('The disambiguation line for Nirvana is: {}'.format(
+          results['artists'][0]['disambiguation']))
 
-    artist_data = query_site(ARTIST_URL, query_type["releases"], artist_id)
-    releases = artist_data["releases"]
-    print("\nONE RELEASE:")
-    pretty_print(releases[1], indent=2)
-    release_titles = [r["title"] for r in releases]
+    # One Direction Question
+    # results = query_by_name(ARTIST_URL, query_type["simple"],
+    #                         "One Direction")
+    # pretty_print(results)
 
-    print("\nALL TITLES:")
-    for t in release_titles:
-        print(t)
+    # print('One Direction started in: {}'.format(results['artists'][0]
+    #       ['life-span']['begin']))
 
 
 if __name__ == '__main__':

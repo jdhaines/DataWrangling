@@ -10,7 +10,6 @@ Please see the test function for the expected return format
 """
 
 import os
-
 import xlrd
 from zipfile import ZipFile
 datafile = "data/2013_ERCOT_Hourly_Load_Data.xls"
@@ -71,7 +70,7 @@ def parse_file(datafile):
     for i in range(len(sheet.col_values(1))):
         if sheet_data[i][1] == data['minvalue']:
             data['mintime'] = xlrd.xldate_as_tuple(sheet_data[i][0], 0)
-            
+
     return data
 
 
