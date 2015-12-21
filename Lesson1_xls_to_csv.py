@@ -13,9 +13,9 @@ datafile = "data/2013_ERCOT_Hourly_Load_Data.xls"
 outfile = "2013_Max_Loads.csv"
 
 
-# def open_zip(datafile):
-#     with ZipFile('{0}.zip'.format(datafile), 'r') as myzip:
-#         myzip.extractall[]
+def open_zip(datafile):
+    with ZipFile('{0}.zip'.format(datafile), 'r') as myzip:
+        myzip.extractall()
 
 
 def parse_file(datafile):
@@ -25,87 +25,113 @@ def parse_file(datafile):
     # YOUR CODE HERE
     # Remember that you can use xlrd.xldate_as_tuple(sometime, 0) to convert
     # Excel date to Python tuple of (year, month, day, hour, minute, second)
+    return sheet
+
+
+def save_file(sheet, filename):
+    '''Get a sheet for xlrd use, data list of lists, and an output filename.'''
+
+    header = ['Station', 'Year', 'Month', 'Day', 'Hour', 'Max Load']
+
     data = [[sheet.cell_value(r, col) for col in range(sheet.ncols)]
             for r in range(sheet.nrows)]
-    return data, sheet
-
-
-def save_file(data, sheet, filename):
-    '''Get a sheet for xlrd use, data list of lists, and an output filename.'''
     
-    # definitions
-    output = [
-             ['', []],
-             ['', []],
-             ['', []],
-             ['', []],
-             ['', []],
-             ['', []],
-             ['', []],
-             ['', []]
-    ]
-    maxvalues = []
+    # Build the station list
+    stations = []
+    for i in range(sheet.ncols):
+        stations.append(sheet.col_values(i)[0])
+    stations.pop()
+    stations.reverse()
+    stations.pop()
+    stations.reverse()
 
-    # station list
-    stations = ['COAST', 'EAST', 'FAR_WEST', 'NORTH', 'NORTH_C', 'SOUTHERN',
-                'SOUTH_C', 'WEST']
+    # Get the column numbers for each station in a dict.
+    # {u'FAR_WEST': 3, u'NORTH': 4, u'ERCOT': 9, ...
+    col_nums = {}
+    for station in stations:
+        col_nums.setdefault(station)  # set keys
 
-    # find the max values for each column
     for i, station in enumerate(stations):
-        output['maxvalue'] = max(sheet.col_values(1, start_rowx=1))
+        if sheet.col_values(i+1)[0] in stations:
+            col_nums[station] = i + 1
 
-
-    # load the stations into the output variable
+    # Find the max values for each column.
+    maxvals = []
     for i, station in enumerate(stations):
-        output[i][0] = stations[i]
+        maxvals.append(max(sheet.col_values(col_nums[station], start_rowx=1)))
 
-    print(output)
+    # Find the times for the max values
+    maxval_times = []
+    for i, station in enumerate(stations):
+        for j in range(len(sheet.col_values(i+1))):  # needs equal number rows
+            if data[j][i+1] == maxvals[i]:
+                maxval_times.append((xlrd.xldate_as_tuple(data[j][0], 0))[:4])
 
-data, sheet = parse_file(datafile)
-save_file(data, sheet, outfile)
+    # Round the max values
+    rounded_maxvals = []
+    for k in range(len(maxvals)):
+        rounded_maxvals.append(round(maxvals[k], 1))
 
-# def test():
-#     # open_zip(datafile)
-#     data = parse_file(datafile)
-#     save_file(data, outfile)
+    # Format the output
+    output = []
+    for i in range(len(stations)):
+        row = []
+        row.append(stations[i])
+        row.extend(list(maxval_times[i]))
+        row.append(rounded_maxvals[i])
+        output.append(row)
+    output.insert(0, header)
 
-#     number_of_rows = 0
-#     stations = []
+    with open(filename, 'wb') as csvfile:
+        mywriter = csv.writer(csvfile, delimiter='|')
+        for n in range(len(output)):
+            mywriter.writerow(output[n])
 
-#     ans = {'FAR_WEST': {'Max Load': '2281.2722140000024',
-#                         'Year': '2013',
-#                         'Month': '6',
-#                         'Day': '26',
-#                         'Hour': '17'}}
-#     correct_stations = ['COAST', 'EAST', 'FAR_WEST', 'NORTH',
-#                         'NORTH_C', 'SOUTHERN', 'SOUTH_C', 'WEST']
-#     fields = ['Year', 'Month', 'Day', 'Hour', 'Max Load']
+# data, sheet = parse_file(datafile)
+# save_file(data, sheet, outfile)
 
-#     with open(outfile) as of:
-#         csvfile = csv.DictReader(of, delimiter="|")
-#         for line in csvfile:
-#             station = line['Station']
-#             if station == 'FAR_WEST':
-#                 for field in fields:
-#                     # Check if 'Max Load' is within .1 of answer
-#                     if field == 'Max Load':
-#                         max_answer = round(float(ans[station][field]), 1)
-#                         max_line = round(float(line[field]), 1)
-#                         assert max_answer == max_line
+def test():
+    # open_zip(datafile)
+    sheet = parse_file(datafile)
+    save_file(sheet, outfile)
 
-#                     # Otherwise check for equality
-#                     else:
-#                         assert ans[station][field] == line[field]
+    number_of_rows = 0
+    stations = []
 
-#             number_of_rows += 1
-#             stations.append(station)
+    ans = {'FAR_WEST': {'Max Load': '2281.2722140000024',
+                        'Year': '2013',
+                        'Month': '6',
+                        'Day': '26',
+                        'Hour': '17'}}
+    correct_stations = ['COAST', 'EAST', 'FAR_WEST', 'NORTH',
+                        'NORTH_C', 'SOUTHERN', 'SOUTH_C', 'WEST']
+    fields = ['Year', 'Month', 'Day', 'Hour', 'Max Load']
 
-#         # Output should be 8 lines not including header
-#         assert number_of_rows == 8
+    with open(outfile) as of:
+        csvfile = csv.DictReader(of, delimiter="|")
+        for line in csvfile:
+            station = line['Station']
+            if station == 'FAR_WEST':
+                for field in fields:
+                    # Check if 'Max Load' is within .1 of answer
+                    if field == 'Max Load':
+                        max_answer = round(float(ans[station][field]), 1)
+                        max_line = round(float(line[field]), 1)
+                        assert max_answer == max_line
 
-#         # Check Station Names
-#         assert set(stations) == set(correct_stations)
+                    # Otherwise check for equality
+                    else:
+                        assert ans[station][field] == line[field]
+
+            number_of_rows += 1
+            stations.append(station)
+
+        # Output should be 8 lines not including header
+        assert number_of_rows == 8
+
+        # Check Station Names
+        assert set(stations) == set(correct_stations)
 
 
-# if __name__ == "__main__":
-#     test()
+if __name__ == "__main__":
+    test()
