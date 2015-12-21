@@ -19,19 +19,19 @@ outfile = "2013_Max_Loads.csv"
 
 
 def parse_file(datafile):
+    '''Here is some docstring text.'''
     workbook = xlrd.open_workbook(datafile)
     sheet = workbook.sheet_by_index(0)
-    data = None
     # YOUR CODE HERE
     # Remember that you can use xlrd.xldate_as_tuple(sometime, 0) to convert
     # Excel date to Python tuple of (year, month, day, hour, minute, second)
     data = [[sheet.cell_value(r, col) for col in range(sheet.ncols)]
             for r in range(sheet.nrows)]
-    return data
+    return data, sheet
 
 
-def save_file(data, filename):
-    # YOUR CODE HERE
+def save_file(data, sheet, filename):
+    '''Get a sheet for xlrd use, data list of lists, and an output filename.'''
     
     # definitions
     output = [
@@ -52,19 +52,17 @@ def save_file(data, filename):
 
     # find the max values for each column
     for i, station in enumerate(stations):
-        max_loads = []
-        row[i] = 
+        output['maxvalue'] = max(sheet.col_values(1, start_rowx=1))
 
 
     # load the stations into the output variable
     for i, station in enumerate(stations):
         output[i][0] = stations[i]
 
-
     print(output)
 
-data = parse_file(datafile)
-save_file(data, outfile)
+data, sheet = parse_file(datafile)
+save_file(data, sheet, outfile)
 
 # def test():
 #     # open_zip(datafile)
