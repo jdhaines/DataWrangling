@@ -27,7 +27,7 @@ import requests
 URL_MAIN = "http://api.nytimes.com/svc/"
 URL_POPULAR = URL_MAIN + "mostpopular/v2/"
 API_KEY = {"popular": "",
-            "article": ""}
+           "article": ""}
 
 
 def get_from_file(kind, period):
@@ -69,10 +69,10 @@ def get_popular(url, kind, days, section="all-sections", offset=0):
     # of the site and return the data, or print an error message if called
     # incorrectly
     if days not in [1, 7, 30]:
-        print "Time period can be 1,7, 30 days only"
+        print("Time period can be 1,7, 30 days only")
         return False
     if kind not in ["viewed", "shared", "emailed"]:
-        print "kind can be only one of viewed/shared/emailed"
+        print("kind can be only one of viewed/shared/emailed")
         return False
 
     url += "most{0}/{1}/{2}.json".format(kind, section, days)
@@ -105,6 +105,6 @@ def test():
     assert urls[20] == 'http://graphics8.nytimes.com/images/2014/02/17/sports \
                         /ICEDANCE/ICEDANCE-thumbStandard.jpg'
 
-
 if __name__ == "__main__":
     test()
+# end

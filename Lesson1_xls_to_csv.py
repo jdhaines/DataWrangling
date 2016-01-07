@@ -35,7 +35,7 @@ def save_file(sheet, filename):
 
     data = [[sheet.cell_value(r, col) for col in range(sheet.ncols)]
             for r in range(sheet.nrows)]
-    
+
     # Build the station list
     stations = []
     for i in range(sheet.ncols):
